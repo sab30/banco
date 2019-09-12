@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const { check, validationResult } = require('express-validator/check');
 const auth = require('../../middleware/auth');
 
 // @route    POST api/notifications
