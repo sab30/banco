@@ -36,13 +36,13 @@ nodejs 8+
     Method : POST
     Access : Public
     RAW POST body: {"user_name":"sab30"}
-    Content-Type : app;licaton/json
+    Content-Type : applicaton/json
     
     3. Access notificatios api via token 
     URL : localhost:3000/api/notifications
     Method : GET 
     Access : Private
-    Content-Type : app;licaton/json
+    Content-Type : applicaton/json
     Headers : x-auth-token : JWT token received form the above 2
     
     4. Proxy API - In progress
