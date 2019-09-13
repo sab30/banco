@@ -6,25 +6,17 @@ const config = require('config');
 let fs = require("fs");
 const NodeCache = require( "node-cache" );
 const myCache = new NodeCache( { stdTTL: 100000, checkperiod: 120000 } );
+const auth = require('../../middleware/auth');
 // @route    GET api/proxy
 // @desc     GET pagination based 
 // @access   Public
 
-function githubURL(){
-    return 
-    `https://api.github.com/users/bradtraversy/repos?per_page=10&sort=created:asc&client_id=${
-        config.get('githubClientId' )
-    }&client_secret=${
-        config.get('githubSecret')}`
-}
 
-router.get('/',async (req, res) => {
+router.get('/', auth ,async (req, res) => {
      // console.log(gitRepos.grizzly);
-
-    try {   
-        
+    try {
         const options = {
-            uri: `https://api.github.com/users/dutt23/repos?per_page=100&sort=created:asc&client_id=${config.get('githubClientId')}&client_secret=${config.get('githubSecret')}`,
+            uri: `https://api.github.com/users/${req.user.user_name}/repos?per_page=300&sort=created:asc&client_id=${config.get('githubClientId')}&client_secret=${config.get('githubSecret')}`,
             method: 'GET',
             headers: { 'user-agent': 'node.js' }
           };
@@ -62,12 +54,10 @@ router.get('/',async (req, res) => {
             }
                 getObj = value;
                 if(getObj.max == getObj.currentPage){
-                    page =  getObj.currentPage + getObj.change;
-                    getObj = { min: 0, change : -1 ,max: pageCount ,currentPage:0};
+                    getObj = { min: 0, change : -1 ,max: pageCount ,currentPage: getObj.currentPage };
                 }
-                if(getObj.min == getObj.currentPage){
-                    page =  getObj.currentPage + getObj.change;
-                    getObj = { min: 0, change : +1 ,max: pageCount ,currentPage:0};
+                if(getObj.min == getObj.currentPage || getObj.currentPage==1){
+                    getObj = { min: 0, change : +1 ,max: pageCount ,currentPage: getObj.currentPage };
                 }
 
                 getObj.currentPage= getObj.currentPage + getObj.change;
@@ -75,9 +65,16 @@ router.get('/',async (req, res) => {
                 myCache.set( user_name , getObj, function( err, success ){
                     if( !err && success ){
                          test = myCache.get( user_name );
-                        console.log(test.currentPage)
+
+                         const options = {
+                            uri: `https://api.github.com/users/${req.user.user_name}/repos?page=${getObj.currentPage}&sort=created:asc&client_id=${config.get('githubClientId')}&client_secret=${config.get('githubSecret')}`,
+                            method: 'GET',
+                            headers: { 'user-agent': 'node.js' }
+                          };
+                        request(options, (error, response, body) => {
+                            res.json({ githubrepos: JSON.parse(body), page :  getObj.currentPage , value : getObj.currentPage });
+                        });
                     }
-                    return res.json({ method : 'get' , value : getObj.currentPage});
                 });
         });
 
