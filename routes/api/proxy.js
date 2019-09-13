@@ -34,12 +34,7 @@ router.get('/',async (req, res) => {
             obj = JSON.parse(body);
             console.log(obj.length);
 
-            // res.send(body);
-
-            let items = ['first','last','prev','next'];
-            let pagelimit = 30;
-
-        
+            // res.send(body);        
             pageCount= Math.ceil(obj.length / 30 );
             console.log(pageCount);
             let arr = [];
@@ -52,7 +47,7 @@ router.get('/',async (req, res) => {
            
             // Check for the users value     
             value = myCache.get( user_name );
-            console.log('Test  :' + value);
+            console.log(value);
             let page = null;
             if ( value == undefined ){
                 obj = { min: 0, change : +1 ,max: pageCount ,currentPage:0};
@@ -60,100 +55,31 @@ router.get('/',async (req, res) => {
                 if( !err && success ){
                     value = myCache.get( user_name );
                     console.log(value);
-                    return res.json({ method : 'set' , value : value});
+                    //return res.json({ method : 'set' , value : value});
                 }
                 });
 
-            }else{
-
-                
+            }
                 getObj = value;
-                page =  getObj.currentPage + getObj.change
-                let middle = Math.floor( getObj.max / 2);
-                for (let index = 0; index < getObj.max; index++) {
-                    if(index == getObj.change){
-                        page = index + 1 ;
-                    }
-                    if(mid == getObj.change){
-                        page = mid;
-                    }else{
-                        page = index + 1;
-                    }                       
+                if(getObj.max == getObj.currentPage){
+                    page =  getObj.currentPage + getObj.change;
+                    getObj = { min: 0, change : -1 ,max: pageCount ,currentPage:0};
+                }
+                if(getObj.min == getObj.currentPage){
+                    page =  getObj.currentPage + getObj.change;
+                    getObj = { min: 0, change : +1 ,max: pageCount ,currentPage:0};
                 }
 
-                // Set change value
+                getObj.currentPage= getObj.currentPage + getObj.change;
 
-                // Set page value
-                value.page=page;
-
-                return res.json({ method : 'get' , value : value});
-            }
-
-            
-            // //Then store the value
-
-            
-
-            // return;
-
-            // if (error) return console.error(error);
-      
-            // if (response.statusCode !== 200) {
-            //   return res.status(404).json({ msg: 'No Github profile found' });
-            // }
-            
-
-
-          
-            // // let randomItem = items[Math.floor(Math.random()*items.length)];
-
-            // let validator = {
-            //     get: function(obj, prop) {
-            //         return prop in obj ?
-            //             obj[prop] :
-            //             37;
-            //     }
-            //   };
-              
-            //   let person = new Proxy({}, validator);
-              
-            //   person.age = randomItem;
-            //   console.log(person.age); // 100
-            // return ;
-            //     let repoCount= 0;
-            //     // console.log(repo.action);
-            //     // console.log(repo.action);
-            //     // console.log(randomItem);
-            //     // console.log(randomItem);
-            //     // console.log('length');
-            //     // console.log(body.length);
-
-
-
-            //     const gitRepos = new Proxy(repo,{
-            //         get : function(target, prop){
-            //             console.log('prop');
-            //             console.log(prop);
-            //             // console.log('prop : ' + prop );
-
-            //             switch (prop) {
-            //                 case 'prev':    { return res.status(200).send('prev'); }
-            //                 case 'last':    { return res.status(200).send(body[body.length -1]); }
-            //                 case 'first':   { return res.status(200).send(body[0]);}
-            //                 case 'next':    { return res.status(200).send('next'); }
-            //             }
-
-            //             //return res.status(200).send(body);
-            //         }
-            //     });
-            
-            //     console.log(gitRepos)
+                myCache.set( user_name , getObj, function( err, success ){
+                    if( !err && success ){
+                         test = myCache.get( user_name );
+                        console.log(test.currentPage)
+                    }
+                    return res.json({ method : 'get' , value : getObj.currentPage});
+                });
         });
-
-
-        
-        
-       
 
     } catch (err) {
       console.error(err.message);
