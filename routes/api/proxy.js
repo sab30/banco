@@ -13,7 +13,6 @@ const auth = require('../../middleware/auth');
 
 
 router.get('/', auth ,async (req, res) => {
-     // console.log(gitRepos.grizzly);
     try {
         const options = {
             uri: `https://api.github.com/users/${req.user.user_name}/repos?per_page=300&sort=created:asc&client_id=${config.get('githubClientId')}&client_secret=${config.get('githubSecret')}`,
@@ -84,93 +83,5 @@ router.get('/', auth ,async (req, res) => {
     }
   }
 );
-
-
-
-function proxyTest(){
-
-    const IndexedArray = new Proxy (Array, {
-        construct : function (target, [arr]){
-            const index ={};
-
-            arr.forEach(item => {
-                index[item.id]= item;
-            });
-
-            const newArr=  new  target(...arr);
-
-            return new Proxy(newArr, {
-                get: function(target, name){
-                    if(name ==='push'){
-                        return function (item ){
-                            index[item.id] = item;
-                            return target[name].call(target, name);
-                        }
-
-                    }else if(name === 'findById'){
-                        return function(id){
-                            return index[id];
-                        }
-                    }
-
-                    return target[name]; 
-                }
-            })
-        }
-    })
-
-    const bears = new IndexedArray([
-        { id : 1 , name : 'grizzzly'},
-        { id : 2 , name : 'black'},
-        { id : 3 , name : 'polar'}
-    ]);
-
-    bears.push({
-        id: 55,
-        name : 'brown'
-    })
-    let repos =new  Proxy(githubURL, {
-        proxyErrorHandler: function(err, res, next) {
-            console.log(1);
-            switch (err && err.code) {
-            case 'prev':    { return res.status(200).send('prev'); }
-            case 'last':    { return res.status(200).send('last'); }
-            case 'first':   { return res.status(200).send('first'); }
-            case 'next':    { return res.status(200).send('next'); }
-            default:              { next(err); }
-            }
-        }});
-
-        repos;  
-    const brown = bears.findById(1);
-    console.log(brown);
-    //let bears = { grizzly : true };
-    // let repoCount= 0;
-
-
-    // const gitRepos = new Proxy(bears,{
-    //     get : function(target, prop){
-    //         if(prop === 'grizzly') repoCount ++;
-    //         return target[prop];
-    //     }
-    // });
-
-    // console.log(gitRepos.grizzly);
-    // console.log(gitRepos.grizzly);
-    // console.log(gitRepos.grizzly);
-    // console.log(gitRepos.grizzly);
-    // console.log(repoCount);
-    // res.send({loud : loud});
-
-
-    // const loud = new Proxy(githubAPI, {
-    //     apply : function(target, thisArg, args){
-    //         return target().toUpperCase() +'!!!';
-    //     }
-    // });
-
-
-    //console.log(loud());
-}
 
 module.exports = router;
