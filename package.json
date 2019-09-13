@@ -15,6 +15,7 @@
     "express-http-proxy": "^1.5.1",
     "express-validator": "^5.3.1",
     "jsonwebtoken": "^8.5.1",
+    "node-cache": "^4.2.1",
     "request": "^2.88.0"
   },
   "devDependencies": {
