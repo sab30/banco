@@ -35,7 +35,7 @@ nodejs 8+
     URL : localhost:3000/api/auth  | 
     Method : POST
     Access : Public
-    RAW POST body: {"user_name":"sab30"}
+    RAW POST body: {"user_name":  <github username> } 
     Content-Type : applicaton/json
     
     3. Access notificatios api via token 
@@ -45,7 +45,14 @@ nodejs 8+
     Content-Type : applicaton/json
     Headers : x-auth-token : JWT token received form the above 2
     
-    4. Proxy API - In progress
+    4. Proxy API
+    URL : localhost:3000/api/proxy
+    Method : GET 
+    Access : Private
+    Content-Type : applicaton/json
+    Headers : x-auth-token : JWT token received form the above 2
+    
+    
     5. Caaching User Results - In Progress
 
 ```
