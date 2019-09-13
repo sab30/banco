@@ -23,28 +23,28 @@ router.get('/', auth ,async (req, res) => {
         request(options, (error, response, body) => {
 
             obj = JSON.parse(body);
-            console.log(obj.length);
+           // console.log(obj.length);
 
             // res.send(body);        
             pageCount= Math.ceil(obj.length / 30 );
-            console.log(pageCount);
-            let arr = [];
-            for(i=0 ; i < pageCount ; i++){
-                arr[i] = i;
-            }
-            console.log('arr');
-            console.log(arr);
-            user_name='dutt23';
+            // console.log(pageCount);
+            // let arr = [];
+            // for(i=0 ; i < pageCount ; i++){
+            //     arr[i] = i;
+            // }
+            // console.log('arr');
+            // console.log(arr);
+            // user_name='dutt23';
            
             // Check for the users value     
-            value = myCache.get( user_name );
+            value = myCache.get( req.user.user_name );
             console.log(value);
             let page = null;
             if ( value == undefined ){
                 obj = { min: 0, change : +1 ,max: pageCount ,currentPage:0};
-                myCache.set( user_name , obj, function( err, success ){
+                myCache.set( req.user.user_name , obj, function( err, success ){
                 if( !err && success ){
-                    value = myCache.get( user_name );
+                    value = myCache.get( req.user.user_name );
                     console.log(value);
                     //return res.json({ method : 'set' , value : value});
                 }
@@ -61,9 +61,9 @@ router.get('/', auth ,async (req, res) => {
 
                 getObj.currentPage= getObj.currentPage + getObj.change;
 
-                myCache.set( user_name , getObj, function( err, success ){
+                myCache.set( req.user.user_name , getObj, function( err, success ){
                     if( !err && success ){
-                         test = myCache.get( user_name );
+                         test = myCache.get( req.user.user_name );
 
                          const options = {
                             uri: `https://api.github.com/users/${req.user.user_name}/repos?page=${getObj.currentPage}&sort=created:asc&client_id=${config.get('githubClientId')}&client_secret=${config.get('githubSecret')}`,
